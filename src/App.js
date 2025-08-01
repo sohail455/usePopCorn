@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import StarRating from "./starRating";
+import { useLocalStorage } from "./useLocalStorage";
+
 const tempMovieData = [
   {
     imdbID: "tt1375666",
@@ -54,11 +56,15 @@ const key = "27ea4592";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  // const [watched, setWatched] = useState(() => {
+  //   return JSON.parse(localStorage.getItem("watched"));
+  // });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
+
+  const [watched, setWatched] = useLocalStorage([], "watched");
 
   function handelRemoveMovie(id) {
     setWatched(() => watched.filter((movie) => movie.ID !== id));
@@ -70,13 +76,16 @@ export default function App() {
     setSelected((prev) => (prev === value ? null : value));
   }
   function handelAddingToWatchedList(newWatchedMovie) {
-    const idExists = watched.some((el) => el.ID === newWatchedMovie.ID);
-
-    if (idExists) {
-      return;
-    }
     setWatched(() => [...watched, newWatchedMovie]);
   }
+
+  // useEffect(
+  //   function () {
+  //     localStorage.setItem("watched", JSON.stringify(watched));
+  //   },
+  //   [watched]
+  // );
+
   useEffect(
     function () {
       const controller = new AbortController();
